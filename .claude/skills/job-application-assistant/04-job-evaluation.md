@@ -60,9 +60,9 @@ How well do the required/preferred skills align with the candidate's capabilitie
 | 40-59 | Partial match, significant upskilling needed |
 | 0-39 | Fundamental mismatch |
 
-**Strong match areas:** [YOUR_PRIMARY_SKILLS]
-**Moderate match areas:** [YOUR_SECONDARY_SKILLS]
-**Weak match areas:** [SKILLS_YOU_LACK]
+**Strong match areas:** TypeScript, JavaScript (ES6+), Python, Java, SQL, React.js, Next.js, FastAPI, Spring Boot, Stripe, Zoho Payments, Razorpay, PostgreSQL, MongoDB, Git, GitHub Actions, Docker, AWS Elastic Beanstalk, Firebase App Hosting
+**Moderate match areas:** Angular, Redux, Tailwind CSS, Express.js, Django, REST APIs, Microservices, RabbitMQ, JWT, OAuth 2.0, RBAC, Clerk, Firebase/Firestore, Supabase, Vercel, Render
+**Weak match areas:** None currently identified — candidate's skill profile comprehensively covers requirements for full-stack development roles
 
 ### 2. Experience Match (0-100)
 Does work history align with what they're looking for? Match on the function and nature of the work performed, not the literal job title - a "Data Consultant" and a "Data Scientist" role can be functionally identical.
@@ -107,19 +107,19 @@ Does this role advance career goals and contain tasks that energize?
 | 0-39 | Dead end or backwards step |
 
 **Career goals:**
-- [YOUR_CAREER_GOAL_1]
-- [YOUR_CAREER_GOAL_2]
-- [YOUR_CAREER_GOAL_3]
+- Full Stack Developer roles: build and operate end-to-end web products, from schema to deployment, ideally with a product-engineering culture
+- Backend Developer / Systems Engineer roles: design and own scalable backend microservices, payment infrastructure, and real-time event pipelines
+- AI / LLM Systems Engineer roles: build production-grade multi-provider LLM runtimes, agentic workflows, and observability for AI features
 
 **Motivation filter:** Evaluate not just whether you *can* do the tasks, but whether the tasks will *energize* you. Consider:
-- Tasks that energize: [YOUR_ENERGIZING_TASKS]
-- Tasks that drain: [YOUR_DRAINING_TASKS]
+- Tasks that energize: building scalable backend microservices, agentic AI workflows, SaaS/fintech product systems, payment infrastructure with real revenue impact, multi-provider runtime routing and failover design
+- Tasks that drain: heavy frontend-only polish work with no systems ownership, roles without on-call or production access, maintenance-only refactor work with no shipping
 - Non-task factors: leadership style, department culture, company values, degree of autonomy
 
 **Life situation alignment:** Consider personal constraints:
-- **Security**: [YOUR_FINANCIAL_SITUATION_CONTEXT]
-- **Flexibility**: [YOUR_SCHEDULE_CONSTRAINTS]
-- **Professional development**: [YOUR_GROWTH_PRIORITIES]
+- **Security**: Open to market-standard / competitive compensation for Full Stack & AI roles
+- **Flexibility**: Open to remote (global/India) and relocation within India (Bangalore, NCR/Gurgaon/Noida, Hyderabad, Pune); international only with visa sponsorship
+- **Professional development**: Growth into larger-scale distributed systems and deeper AI product ownership
 
 ### 6. Salary Benchmark (Optional)
 

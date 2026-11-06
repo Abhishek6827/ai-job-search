@@ -59,7 +59,7 @@ Expected output: `Output written on main_<company>_<role>.pdf (2 pages, ...)`. A
     linkcolor=blue,
     filecolor=magenta,
     urlcolor=blue,
-    pdftitle={[YOUR_NAME] - CV},
+    pdftitle={Abhishek Tiwari - CV},
     % Keep pdfpagemode=UseNone: this block runs after moderncv's own
     % \AtEndPreamble (moderncv.cls sets pdfpagemode there), so a FullScreen
     % value here would win and open every CV in fullscreen presentation mode.
@@ -69,13 +69,13 @@ Expected output: `Output written on main_<company>_<role>.pdf (2 pages, ...)`. A
 \usepackage{import}
 
 % Personal data
-\name{[FIRST_NAME]}{[LAST_NAME]}
+\name{Abhishek Tiwari}
 % If you have no address to list, DELETE this whole line. \address{}{}{} fails
 % with "There's no line here to end" on every moderncv version.
-\address{[YOUR_ADDRESS]}{}{}
-\phone[mobile]{[YOUR_PHONE]}
-\email{[YOUR_EMAIL]}
-\extrainfo{\href{[YOUR_LINKEDIN_URL]}{LinkedIn}, \href{[YOUR_GITHUB_URL]}{GitHub}}
+\address{Lucknow, India}{}{}
+\phone[mobile]{+91-7081660941}
+\email{abhishektiwari6827@gmail.com}
+\extrainfo{\href{https://linkedin.com/in/abhishek-tiwariiii}{LinkedIn}, \href{https://github.com/abhishek6827}{GitHub}}
 
 \begin{document}
 \makecvtitle
@@ -137,11 +137,14 @@ When the role sits outside your home domain, **lead with the domain-transfer arg
 **Create 2-3 profile statement templates for your main role types:**
 
 <!-- SETUP: These are populated based on your background -->
-**For [YOUR_PRIMARY_ROLE_TYPE] roles:**
-> [YOUR_PROFILE_STATEMENT_TEMPLATE_1]
+**For Full Stack / Backend Engineer roles:**
+> Full-stack engineer with 2+ years of experience building production web applications end to end, from database schema to deployment. Shipped 4 customer-facing applications as sole engineer at an early-stage startup, and now operate CHINTU AI, a live multi-LLM SaaS with 500+ registered users and 40+ paying subscribers across web, desktop, and Android. TypeScript-first across React and Node, with Python/FastAPI and Java/Spring Boot for backend and microservice work.
 
-**For [YOUR_SECONDARY_ROLE_TYPE] roles:**
-> [YOUR_PROFILE_STATEMENT_TEMPLATE_2]
+**For AI / LLM Systems Engineer roles:**
+> Full-stack engineer building production AI systems. Founded CHINTU AI, a live multi-LLM SaaS serving 25k+ monthly inferences, with runtime routing across Groq, Gemini, and OpenRouter holding sub-400 ms fallback at 99.8% uptime. Backed by asynchronous Python/FastAPI services with RabbitMQ background workers and schema-validated retry pipelines that cut user-facing error rates from 7.2% to under 0.4%. Brings the whole stack to LLM work: routing, failover, usage-based billing, and observability.
+
+**For Payments / Fintech Engineer roles:**
+> Full-stack engineer with hands-on ownership of payment infrastructure. Sole owner of the Stripe and Zoho Payments integration at a fintech investment platform, where I replaced scheduled polling with a webhook-driven event pipeline and cut payment-failure detection lag from 20 minutes to under 3. Built Razorpay credit-based billing with HMAC signature verification and idempotent transaction processing at 100% reconciliation accuracy. Comfortable owning integrations end to end, from signature verification to entitlement sync.
 
 Statements labeled *[Used for: <company>_<role>]* were extracted from archived application drafts by `/setup` Path A. They are **phrasing references, never fact sources**: when drafting from one, every factual claim still comes from `01-candidate-profile.md` - a past tailored draft does not vouch for its own accuracy.
 

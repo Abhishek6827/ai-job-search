@@ -1,10 +1,10 @@
-# Job Application Assistant for [YOUR_NAME]
+# Job Application Assistant for Abhishek Tiwari
 
 <!-- SETUP: This file is populated by running /setup -->
 <!-- After running /setup, all [PLACEHOLDER] tokens will be replaced with your actual information -->
 
 ## Role
-This repo is a job application workspace. Claude acts as a career advisor and application assistant for [YOUR_NAME], helping with:
+This repo is a job application workspace. Claude acts as a career advisor and application assistant for Abhishek Tiwari, helping with:
 1. **Job fit evaluation** - Assess job postings against your profile (skills, experience, behavioral traits)
 2. **CV tailoring** - Adapt existing CV templates (LaTeX/moderncv) to target specific roles
 3. **Cover letter writing** - Draft targeted cover letters using existing templates (LaTeX)
@@ -16,76 +16,102 @@ This repo is a job application workspace. Claude acts as a career advisor and ap
 <!-- This section is auto-populated by /setup. You can also fill it in manually. -->
 
 ### Identity
-- **Name:** [YOUR_NAME]
-- **Location:** [YOUR_CITY], [YOUR_COUNTRY] ([YOUR_COMMUTE_CONSTRAINTS])
+- **Name:** Abhishek Tiwari
+- **Location:** Lucknow, India (Open to remote global/India, relocation to Bangalore/NCR/Hyderabad/Pune; international only with visa sponsorship)
 - **Languages:**
   | Language | Level |
   |----------|-------|
-  | [LANGUAGE] | [LEVEL] |
+  | English | Professional working proficiency / Fluent |
+  | Hindi | Native |
   <!-- Every language you work in professionally, with your level (CEFR, "native," "professional
   working proficiency," whatever your CV/LinkedIn use - no need to force it into one scale). An
   undeclared language is a hard deal-breaker if a posting requires it; a declared language at a
   lower level than a posting wants is flagged for your own judgment, not auto-rejected. See
   04-job-evaluation.md's Language Gate. -->
-- **CV language:** [YOUR_CV_LANGUAGE] <!-- English unless your market expects otherwise; /setup asks -->
+- **CV language:** English <!-- English unless your market expects otherwise; /setup asks -->
 
-- **Status:** [YOUR_EMPLOYMENT_STATUS]
-- **LinkedIn headline:** "[YOUR_LINKEDIN_HEADLINE]"
+- **Status:** Open to remote and remote relocation
+- **LinkedIn headline:** "Full Stack Developer — AI/LLM & Payments Systems"
 
 ### Education
 <!-- List your degrees, most recent first -->
-- **[DEGREE_LEVEL] in [FIELD]** ([YEAR_START]-[YEAR_END]) - [INSTITUTION]
-  - Thesis: "[THESIS_TITLE]"
-  - Topics: [KEY_TOPICS]
+- **Master of Computer Applications (MCA)** (2022-2024) - Chitkara University, Chandigarh, India
+  - Thesis: (not provided)
+  - Topics: (not provided)
+
+- **Bachelor of Computer Applications (BCA)** (2019-2022) - The Bhopal School of Social Sciences (BSSS), Bhopal, India
+  - Thesis: (not provided)
+  - Topics: (not provided)
 
 ### Professional Experience
 <!-- List your roles, most recent first -->
-- **[JOB_TITLE]** ([START_DATE] - [END_DATE]) - **[COMPANY]** ([LOCATION])
-  - [KEY_RESPONSIBILITY_1]
-  - [KEY_RESPONSIBILITY_2]
-  - [KEY_ACHIEVEMENT]
+- **Founder & Full Stack Developer** (Feb 2026 - Present) - **CHINTU AI** (Remote, India)
+  - Built multi-platform clients (React, Electron, Android) and backend serving 25k+ monthly LLM inferences
+  - Engineered runtime routing across Groq, Gemini, OpenRouter with sub-400 ms fallback, 99.8% uptime
+  - Implemented Razorpay credit-based billing with HMAC verification and idempotent transaction processing (100% reconciliation)
+
+- **Full Stack Developer (Contract)** (Nov 2025 - Jan 2026) - **Indian Capital and Investment (Coimbatore) Limited** (Remote, India)
+  - Sole owner of Stripe/Zoho Payments integration end-to-end
+  - Replaced polling with webhook-driven event pipeline, cutting payment-failure detection from 20 min to <3 min
+  - Migrated CI/CD to Firebase App Hosting, cutting deploy time from 30 min to <5 min
+
+- **Software Developer** (Aug 2024 - Oct 2025) - **Vasnaani Sanskaran** (Noida, India)
+  - Sole engineer — designed and shipped 4 customer-facing web applications from schema to deployment
+  - Eliminated N+1 queries and added composite indexes on 3 high-traffic endpoints; p95 from ~850 ms to ~550 ms
+  - Introduced memoized selectors (reselect) across 12 Redux components, 25% render-time improvement
+
+- **Full Stack Developer Intern** (Jan 2024 - Jun 2024) - **Hoping Minds** (Mohali, India)
+  - Rebuilt performance-critical pages as React components consuming Django REST APIs
+  - Raised Lighthouse mobile score from 68 to 94, cut page load time by 22%
 
 ### Technical Skills
-- **Primary:** [YOUR_PRIMARY_SKILLS]
-- **Secondary:** [YOUR_SECONDARY_SKILLS]
-- **Domain:** [YOUR_DOMAIN_EXPERTISE]
-- **Software:** [YOUR_TOOLS_AND_SOFTWARE]
+- **Primary:** TypeScript, JavaScript (ES6+), Python, Java, SQL, React.js, Next.js, FastAPI, Spring Boot, Stripe, Zoho Payments, Razorpay, PostgreSQL, MongoDB, Git, GitHub Actions, Docker, AWS Elastic Beanstalk, Firebase App Hosting
+- **Secondary:** Angular, Redux, Tailwind CSS, Express.js, Django, REST APIs, Microservices, RabbitMQ, JWT, OAuth 2.0, RBAC, Clerk, Firebase/Firestore, Supabase, Vercel, Render
+- **Domain:** Full-stack web application development, payment infrastructure (webhook architecture, HMAC verification, idempotency), multi-LLM SaaS systems and runtime routing, performance optimization
+- **Software:** Electron, Android, AssemblyAI, FFmpeg, Socket.io, WebRTC, LaTeX
 
 ### Certifications
 <!-- List relevant certifications with dates -->
-- **[CERTIFICATION_NAME]** - [HOURS]h - completed [DATE]
+(None listed in source data — add if applicable)
 
 ### Publications
 <!-- List peer-reviewed publications, if any -->
-- [AUTHOR_LIST] ([YEAR]). [TITLE]. [JOURNAL].
+(None listed in source data — add if applicable)
 
 ### Awards
 <!-- List relevant awards, hackathons, competitions -->
-- [AWARD_NAME] - [EVENT] ([YEAR])
+(None listed in source data — add if applicable)
 
 ### Behavioral Profile
 <!-- Your behavioral assessment results (PI, DISC, Myers-Briggs, or self-assessment) -->
-- **[TRAIT_1]** - [DESCRIPTION]
-- **[TRAIT_2]** - [DESCRIPTION]
-- **Strengths:** [YOUR_STRENGTHS]
-- **Growth areas:** [YOUR_GROWTH_AREAS]
-- **Thrives in:** [YOUR_IDEAL_ENVIRONMENT]
+- **Ownership / Founder mindset:** Operates as sole engineer on production systems with direct user impact; comfortable owning end-to-end product decisions
+- **Systems-first thinking:** Solves problems at the data layer (query patterns, indexes) before reaching for framework changes
+- **Evidence-driven:** Verifies every optimization with production metrics (server-timing logs, React DevTools Profiler, Lighthouse) rather than assumptions
+- **Resilience engineering:** Designs for third-party failure (multi-provider failover, idempotency, retries) rather than relying on provider reliability
+- **Strengths:** End-to-end ownership, measurable impact, production debugging, multi-provider integration
+- **Growth areas:** Larger-scale distributed systems, deeper AI product ownership
+- **Thrives in:** Small-to-mid-size teams where you own a product end-to-end, with production access and clear ownership boundaries
 
 ### What Excites You
 <!-- What motivates you professionally -->
-- [PASSION_1]
-- [PASSION_2]
+- Building scalable backend microservices and real-time event pipelines
+- Agentic AI workflows and production-grade multi-provider LLM runtimes
+- SaaS and fintech products with direct revenue impact
 
 ### Target Sectors
 <!-- Industries and companies you're targeting -->
-- [SECTOR_1]: [EXAMPLE_COMPANIES]
-- [SECTOR_2]: [EXAMPLE_COMPANIES]
+- SaaS / Product Engineering: Stripe, Vercel, Render, Supabase, early-stage startups
+- Fintech / Payments: Razorpay, Zoho, fintech investment platforms
+- AI / ML Infrastructure: Groq, OpenRouter, AI product companies
+- Remote-first companies (global/India) with standard tech stacks
 
 ### Deal-breakers
 <!-- Hard constraints on job search. Language requirements are handled separately and
 automatically from your Languages table above - don't duplicate them here. -->
-- [DEALBREAKER_1]
-- [DEALBREAKER_2]
+- Full-time or strong contract role with standard tech stack (TypeScript/Python/Java, React/Node, cloud)
+- Open to remote (global/India) and relocation within India (Bangalore, NCR/Gurgaon/Noida, Hyderabad, Pune)
+- International roles only with visa sponsorship
+- Avoid: frontend-only roles without systems ownership, maintenance-only refactor work, no production access
 
 ## Repo Structure
 - `cv/` - LaTeX CV variants (moderncv template, banking style)

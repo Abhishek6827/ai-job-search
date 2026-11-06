@@ -1,4 +1,4 @@
-%% Example CV - [YOUR_NAME]
+%% Example CV - Abhishek Tiwari
 %% Comprehensive overview of all competencies, experience, and achievements.
 %% Use as a master reference when tailoring role-specific CVs.
 %%
@@ -40,7 +40,7 @@
     linkcolor=blue,
     filecolor=magenta,
     urlcolor=blue,
-    pdftitle={[YOUR_NAME] - CV},
+    pdftitle={Abhishek Tiwari - CV},
     % Keep pdfpagemode=UseNone: this block runs after moderncv's own
     % \AtEndPreamble (moderncv.cls sets pdfpagemode there), so a FullScreen
     % value here would win and open every CV in fullscreen presentation mode.
@@ -50,13 +50,13 @@
 \usepackage{import}
 
 % personal data
-\name{[First]}{[Last]}
+\name{Abhishek}{Tiwari}
 % If you have no address to list, DELETE this whole line. \address{}{}{} fails
 % with "There's no line here to end" on every moderncv version.
-\address{[Your Address, City, Country]}{}{}
-\phone[mobile]{[+XX XXXXXXXXXX]}
-\email{[your.email@example.com]}
-\extrainfo{\href{[https://linkedin.com/in/your-profile]}{LinkedIn}, \href{[https://github.com/your-username]}{GitHub}}
+\address{Lucknow, India}{}{}
+\phone[mobile]{+91-7081660941}
+\email{abhishektiwari6827@gmail.com}
+\extrainfo{\href{https://linkedin.com/in/abhishek-tiwariiii}{LinkedIn}, \href{https://github.com/abhishek6827}{GitHub}}
 
 \begin{document}
 
@@ -67,7 +67,7 @@
 % ============================================================
 
 \vspace{6pt}
-\small{[Write a 3-5 line profile statement tailored to the role you're applying for. Focus on what makes you uniquely qualified. Example: "Data scientist with a PhD in [field] and X years of industry experience. Combines deep domain expertise in [domain] with strong applied machine learning and Python development skills. Experienced in developing end-to-end ML pipelines, from data ingestion to stakeholder-facing dashboards."]}
+\small{Full-stack engineer with 2+ years of experience building production web applications end to end, from database schema to deployment. Shipped 4 customer-facing applications as sole engineer at an early-stage startup, and now operate CHINTU AI, a live multi-LLM SaaS with 500+ registered users and 40+ paying subscribers across web, desktop, and Android. TypeScript-first across React and Node, with Python/FastAPI and Java/Spring Boot for backend and microservice work.}
 
 % ============================================================
 %     CORE COMPETENCIES
@@ -77,15 +77,13 @@
 \vspace{1pt}
 \begin{itemize}
 
-\item \textbf{[Skill Category 1]}: [Specific skills, frameworks, tools. Be concrete.]
+\item \textbf{Programming Languages}: TypeScript, JavaScript (ES6+), Python, Java, SQL
 
-\item \textbf{[Skill Category 2]}: [Specific skills, frameworks, tools.]
+\item \textbf{Frameworks \& LLM Runtimes}: React.js, Next.js, FastAPI, Spring Boot, Groq, OpenRouter, Gemini, DashScope, AssemblyAI, prompt engineering
 
-\item \textbf{[Skill Category 3]}: [Specific skills, frameworks, tools.]
+\item \textbf{Payments \& Billing}: Stripe, Zoho Payments, Razorpay, webhook architecture, HMAC verification, idempotency
 
-\item \textbf{[Skill Category 4]}: [Domain expertise, methods, approaches.]
-
-\item \textbf{[Skill Category 5]}: [Tools, platforms, software.]
+\item \textbf{Database \& Infrastructure}: PostgreSQL, MongoDB, Firebase/Firestore, Supabase, Git, GitHub Actions, Docker, AWS Elastic Beanstalk, Firebase Hosting, Vercel, Render
 
 \end{itemize}
 
@@ -98,31 +96,40 @@
 \begin{itemize}
 
 % --- Most Recent Role ---
-\item{\cventry{[YYYY-Present]}{[Job Title]}{[Company]}{[City, Country]}{}{\vspace{1pt}
+\item{\cventry{Feb 2026 - Present}{Founder \& Full Stack Developer}{CHINTU AI}{Lucknow, India}{}{\vspace{1pt}
 \begin{itemize}
-    \item {[Achievement or responsibility 1 - be specific, use numbers where possible]}
-    \item {[Achievement or responsibility 2]}
-    \item {[Achievement or responsibility 3]}
-    \item {[Achievement or responsibility 4]}
+    \item Built multi-platform clients (React, Electron for Windows/macOS, Android) and backend services serving 25k+ monthly LLM inferences; engineered runtime routing across Groq, Gemini, and OpenRouter with sub-400 ms fallback, achieving 99.8\% uptime
+    \item Developed asynchronous Python/FastAPI services with RabbitMQ background workers for 63-language audio transcription and usage tracking, maintaining sub-2 s task queue latency under peak loads
+    \item Implemented Razorpay credit-based billing with webhook-driven entitlement sync, HMAC signature verification, and idempotent transaction processing with 100\% reconciliation accuracy
+    \item Audited response logs to eliminate silent LLM failures (empty streams, unhandled provider timeouts); added structured schema validation and retries, slashing user-facing error rates from 7.2\% to <0.4\%
 \end{itemize}}}
 
 \vspace{3pt}
 
 % --- Previous Role ---
-\item{\cventry{[YYYY-YYYY]}{[Job Title]}{[Company]}{[City, Country]}{}{\vspace{1pt}
+\item{\cventry{Nov 2025 - Jan 2026}{Full Stack Developer (Contract)}{Indian Capital and Investment (Coimbatore) Limited}{Remote, India}{}{\vspace{1pt}
 \begin{itemize}
-    \item {[Achievement or responsibility 1]}
-    \item {[Achievement or responsibility 2]}
-    \item {[Achievement or responsibility 3]}
+    \item Sole owner of the Stripe and Zoho Payments integration end to end within a team of 20 engineers
+    \item Replaced scheduled polling with a webhook-driven event pipeline, cutting payment-failure detection lag from 20 min to under 3 min; implemented idempotency-key handling and HMAC signature verification across all endpoints
+    \item Migrated CI/CD to Firebase App Hosting, cutting deployment time from 30 min to under 5 min
 \end{itemize}}}
 
 \vspace{3pt}
 
 % --- Earlier Role ---
-\item{\cventry{[YYYY-YYYY]}{[Job Title]}{[Company]}{[City, Country]}{}{\vspace{1pt}
+\item{\cventry{Aug 2024 - Oct 2025}{Software Developer}{Vasnaani Sanskaran}{Noida, India}{}{\vspace{1pt}
 \begin{itemize}
-    \item {[Achievement or responsibility 1]}
-    \item {[Achievement or responsibility 2]}
+    \item Sole engineer; designed and shipped 4 customer-facing web applications from schema to deployment
+    \item Eliminated N+1 query patterns and added composite indexes on 3 high-traffic endpoints; p95 response time dropped from ~850 ms to ~550 ms, confirmed in production server-timing logs
+    \item Introduced memoized selectors (reselect) across 12 Redux-connected components, eliminating full-tree re-renders; measured 25\% improvement with React DevTools Profiler
+\end{itemize}}}
+
+\vspace{3pt}
+
+% --- Earlier Role ---
+\item{\cventry{Jan 2024 - Jun 2024}{Full Stack Developer Intern}{Hoping Minds}{Mohali, India}{}{\vspace{1pt}
+\begin{itemize}
+    \item Rebuilt performance-critical pages as React components consuming Django REST APIs, raising the Lighthouse mobile score from 68 to 94 and cutting page load time by 22\%
 \end{itemize}}}
 
 \end{itemize}
@@ -135,14 +142,14 @@
 \vspace{1pt}
 \begin{itemize}
 
-\item{\cventry{[YYYY-YYYY]}{[Degree] in [Field]}{[Institution]}{[City, Country]}{}{\vspace{1pt}
-Thesis: ``[Thesis Title].'' [Brief description of research focus.]
+\item{\cventry{2022-2024}{Master of Computer Applications (MCA)}{Chitkara University, Chandigarh}{Chandigarh, India}{}{\vspace{1pt}
+Thesis: ``(not provided)'' (not provided)
 }}
 
 \vspace{3pt}
 
-\item{\cventry{[YYYY-YYYY]}{[Degree] in [Field]}{[Institution]}{[City, Country]}{}{\vspace{1pt}
-[Brief description or key topics.]
+\item{\cventry{2019-2022}{Bachelor of Computer Applications (BCA)}{The Bhopal School of Social Sciences (BSSS), Bhopal}{Bhopal, India}{}{\vspace{1pt}
+(not provided)
 }}
 
 \end{itemize}
@@ -154,28 +161,15 @@ Thesis: ``[Thesis Title].'' [Brief description of research focus.]
 \section{Languages}
 \vspace{1pt}
 \begin{itemize}
-\item {[Language 1] (native), [Language 2] (fluent), [Language 3] (intermediate).}
+\item [English] (professional working proficiency / fluent), [Hindi] (native)
 \end{itemize}
 
 % ============================================================
-%     PUBLICATIONS (optional)
+%     PUBLICATIONS (optional - omitted: no publications in profile)
+%     HONORS AND AWARDS (optional - omitted: no awards in profile)
+%     Re-add these sections only when the profile actually has entries;
+%     an empty heading renders as a dangling title on the PDF.
 % ============================================================
-
-\section{Publications}
-\vspace{1pt}
-\begin{itemize}
-\item {[Author(s)] ([Year]). [Title]. [Journal/Conference]. \href{[DOI_URL]}{DOI link}}
-\end{itemize}
-
-% ============================================================
-%     HONORS AND AWARDS (optional)
-% ============================================================
-
-\section{Honors and Awards}
-\vspace{1pt}
-\begin{itemize}
-\item{\textbf{[Award Name]} -- [Event/Organization] ([Year]).}
-\end{itemize}
 
 % ============================================================
 %     REFERENCES

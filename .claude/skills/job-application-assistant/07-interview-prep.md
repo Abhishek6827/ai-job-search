@@ -14,30 +14,35 @@ Keep answers to 1-2 minutes. Be specific. End with what you learned or would do 
 
 ## Ready-Made STAR Examples
 
-<!-- These are populated by /setup from your actual experience. Below are templates showing the format. -->
+<!-- These are populated by /setup from your actual experience. -->
 
-### 1. [PROJECT_NAME] ([SKILL_DEMONSTRATED])
-**S:** [CONTEXT - what was happening, what was the problem]
-**T:** [YOUR RESPONSIBILITY - what you specifically needed to do]
-**A:** [WHAT YOU DID - specific actions, tools, methods]
-**R:** [OUTCOME - measurable results, adoption, impact]
-**Use for:** "[QUESTION_TYPE_1]", "[QUESTION_TYPE_2]"
+### 1. Multi-LLM SaaS Runtime Routing (Reliability / Performance)
+**S:** CHINTU AI serves 500+ users across web, desktop, and Android, with LLM inference routed live across Groq, Gemini, and OpenRouter. Provider latency and failures are visible to every user, and any degradation directly erodes the product's core promise.
+**T:** As founder and sole engineer, I needed to ensure reliable, low-latency responses despite three independent providers each with their own failure modes (timeouts, empty streams, rate limits).
+**A:** I built a runtime router that wraps provider APIs with a uniform interface in asynchronous Python/FastAPI services backed by RabbitMQ background workers for audio transcription. Failover is sub-400 ms; I added structured schema validation and retry logic across the response pipeline, and audited usage logs to find and eliminate silent failures (empty streams, unhandled provider timeouts that previously showed as "no response" to the user).
+**R:** Achieved 99.8% uptime. Eliminated silent LLM failures and cut user-facing error rates from 7.2% to under 0.4%. The platform now processes 25k+ monthly LLM inferences.
+**Use for:** "Tell me about a time you built a resilient system", "How do you handle third-party API failures?", "How do you measure reliability in a distributed system?"
 
-### 2. [PROJECT_NAME] ([SKILL_DEMONSTRATED])
-**S:** [CONTEXT]
-**T:** [YOUR RESPONSIBILITY]
-**A:** [WHAT YOU DID]
-**R:** [OUTCOME]
-**Use for:** "[QUESTION_TYPE_1]", "[QUESTION_TYPE_2]"
+### 2. Webhook-Driven Payment Infrastructure (Systems Design / Ownership)
+**S:** At Indian Capital and Investment (Coimbatore) Limited, a fintech investment platform, I was the sole owner of the Stripe and Zoho Payments integration end to end. The previous implementation polled a third-party gateway every 20 minutes for payment status, creating a long lag before failures were detected and reconciliation was manual and error-prone.
+**T:** I needed to replace polling with a secure, real-time event pipeline and guarantee correct idempotency and reconciliation semantics across two payment providers.
+**A:** I built webhook-driven event endpoints with HMAC signature verification across all routes, implemented idempotency-key handling for every mutation, and structured transaction processing so each event is processed exactly once. Entitlement sync and billing events are driven directly from the verified webhook stream.
+**R:** Cut payment-failure detection lag from 20 minutes to under 3 minutes. Achieved 100% reconciliation accuracy. In a follow-up engagement at CHINTU AI, I built Razorpay credit-based billing with the same HMAC-verified, idempotent pattern from a clean start.
+**Use for:** "Tell me about a payments integration you owned", "How do you handle idempotency?", "How do you secure webhook endpoints?"
 
-### 3. [PROJECT_NAME] ([SKILL_DEMONSTRATED])
-**S:** [CONTEXT]
-**T:** [YOUR RESPONSIBILITY]
-**A:** [WHAT YOU DID]
-**R:** [OUTCOME]
-**Use for:** "[QUESTION_TYPE_1]", "[QUESTION_TYPE_2]"
+### 3. Query Performance Optimization (Engineering / Metrics)
+**S:** At Vasnaani Sanskaran, an early-stage software startup, I was the sole engineer for four customer-facing web applications. Three high-traffic endpoints (listings and search routes serving live product data) were responding at p95 of ~850 ms, which was noticeable to users and threatened page-load goals.
+**T:** I needed to identify the latency source and bring p95 down to acceptable levels without a rewrite or a larger team, using only production-observable data.
+**A:** I profiled the endpoints with production server-timing logs and found classic N+1 query patterns and missing indexes on high-cardinality filter columns. I eliminated the N+1 queries by introducing batched fetches and eager loading, and added composite indexes aligned to the actual filter orderings used by the application.
+**R:** p95 response time dropped from ~850 ms to ~550 ms, confirmed in production server-timing logs. This was the highest-impact optimization for the lowest engineering effort in that product line.
+**Use for:** "How do you debug performance problems in production?", "How do you prioritize performance work?", "Walk me through a performance optimization you made."
 
-<!-- Add more STAR examples as needed. Aim for 4-6 covering different competencies. -->
+### 4. Frontend Performance with Measurable Impact (Frontend / Optimization)
+**S:** At Hoping Minds, the marketing-facing pages were performance-critical: they needed to rank and convert, and the existing Lighthouse mobile score was 68 with slow page loads. As the Full Stack Developer intern, I was asked to bring those pages up to standard.
+**T:** I needed to rebuild performance-critical pages as React components that consume Django REST APIs, and demonstrate a measurable improvement in both Lighthouse score and load time.
+**A:** I rebuilt the hotspots as React components backed by the existing Django REST APIs, introduced memoized selectors (reselect) across 12 Redux-connected components to eliminate full-tree re-renders, and verified changes with the React DevTools Profiler and Lighthouse.
+**R:** Raised the Lighthouse mobile score from 68 to 94 and cut page load time by 22%. The reselect change alone produced a measurable 25% improvement in component render time under the Profiler.
+**Use for:** "How do you optimize frontend performance?", "How do you measure the impact of your work?", "Tell me about a time you improved a metric by a specific amount."
 
 ## Common Tough Questions
 
