@@ -30,3 +30,15 @@
 - **Invariants Established:**
   1. **Reuse Existing Framework:** Use native workspace skills and CLI tools; do not write throwaway scratch scripts in `tools/`.
   2. **Clean Source Control:** Do not stage temporary test artifacts or intermediate JSON files into git index.
+
+## [CLI & Command Parity: scrape & fetch-jobs] - 2026-11-08
+- **Issue/Symptom:**
+  - User requested that both `scrape` and `fetch-jobs` execute the complete end-to-end workflow identically across CLI and agent sessions, exactly matching Claude's original autonomous pipeline.
+  - `.claude/commands/scrape.md` was missing in `.claude/commands/`, and `.claude/commands/fetch-jobs.md` was a minimal 15-line stub lacking explicit orchestration steps.
+- **Root Cause:**
+  - Original `/scrape` specification lived only in `.claude/skills/job-scraper/SKILL.md` rather than an explicit command file, causing command discovery drift across agent runtimes.
+  - Lack of a unified standalone CLI runner that connects portal search CLIs (`.agents/skills/linkedin-search/`), `tools/scrape_state.py` deduplication, and active detail verification directly in terminal without LLM overhead.
+- **Actions Taken & Invariants Established:**
+  1. **Unified Command Specifications:** Created `.claude/commands/scrape.md` and updated `.claude/commands/fetch-jobs.md` with the full 5-step execution pipeline (CLI portal search -> `scrape_state.py` tracker/seen dedup -> detail verification for active status and <=3 yrs exp -> atomic storage -> formatted output).
+  2. **Autonomous CLI Runner (`tools/scrape_cli.py`):** Added a lightweight zero-dependency CLI utility that glues existing portal CLIs (`linkedin-search`) with `tools/scrape_state.py` and `job_key.py`, executable directly in PowerShell via `python tools/scrape_cli.py`.
+  3. **Guaranteed Zero-Duplicate Invariant:** Every run must filter against `job_search_tracker.csv` and `job_scraper/seen_jobs.json` before presenting or storing jobs.
