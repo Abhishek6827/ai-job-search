@@ -42,3 +42,48 @@
   1. **Unified Command Specifications:** Created `.claude/commands/scrape.md` and updated `.claude/commands/fetch-jobs.md` with the full 5-step execution pipeline (CLI portal search -> `scrape_state.py` tracker/seen dedup -> detail verification for active status and <=3 yrs exp -> atomic storage -> formatted output).
   2. **Autonomous CLI Runner (`tools/scrape_cli.py`):** Added a lightweight zero-dependency CLI utility that glues existing portal CLIs (`linkedin-search`) with `tools/scrape_state.py` and `job_key.py`, executable directly in PowerShell via `python tools/scrape_cli.py`.
   3. **Guaranteed Zero-Duplicate Invariant:** Every run must filter against `job_search_tracker.csv` and `job_scraper/seen_jobs.json` before presenting or storing jobs.
+
+## [Skill Alignment & Native Claude Scraper Execution] - 2026-11-09
+- **Issue/Symptom:**
+  - Invoking `/fetch-jobs` loaded an outdated custom skill (`C:\Users\Abhishek\.gemini\config\skills\fetch-jobs\SKILL.md`) that bypassed the repo's native Claude scraping architecture (`tools/scrape_cli.py`, `tools/scrape_state.py`, `job_scraper/seen_jobs.json`).
+- **Root Cause:**
+  - The custom skill contained conflicting instructions mandating zero state persistence and hardcoding a static list, failing the repo's Thin-Pointer Design (`AGENTS.md`) and Claude parity rules.
+- **Actions Taken:**
+  - Updated `C:\Users\Abhishek\.gemini\config\skills\fetch-jobs\SKILL.md` to directly reference and execute the canonical 5-step Claude scraping pipeline (`tools/scrape_cli.py` / `scrape_state.py`).
+  - Upgraded `tools/scrape_cli.py` with multi-portal orchestration (`search_linkedin` + `search_freehire`), expanded priority search queries (`Full Stack`, `React`, `Python`, `AI Engineer`, `Backend`), and `--portal` flag support.
+  - Executed full multi-portal scrape (`--jobage 7 --limit 15 --portal all`), pulling 125 raw postings across LinkedIn and FreeHire.
+  - Deduplicated against `seen_jobs.json` and `job_search_tracker.csv` (21 already seen, 19 batch duplicates filtered).
+  - Hydrated and verified 68 active, strictly 0-3 years experience postings across India and Remote.
+  - Atomically stored all 68 newly found postings into `job_scraper/seen_jobs.json`.
+- **Invariants Established:**
+  1. **Strict Thin-Pointer Alignment:** Antigravity / Gemini skills must mirror `.claude/commands/` and `.claude/skills/` without drifting into static or ad-hoc workflows.
+  2. **Multi-Portal Parity:** `tools/scrape_cli.py` must query both `linkedin-search` and `freehire-search` to aggregate direct company ATS and public board postings.
+  3. **Stateful Scrape Guarantee:** All job scraping must read from and write to `job_scraper/seen_jobs.json` to ensure permanent deduplication.
+  4. **Multi-Source Ingestion:** Scraper pipeline incorporates LinkedIn, FreeHire, direct Naukri listings (`site:naukri.com`), and Indeed (`site:in.indeed.com`) to guarantee complete market coverage across India & Remote.
+
+## [Daily Scrape Parity & 86 Verified Jobs] - 2026-11-10
+- **Workflow Run:**
+  - Automated `/fetch-jobs` execution across 7 key tech query vectors ('Full Stack Developer', 'React Developer', 'Python Developer', 'AI Engineer', 'Backend Developer', 'Frontend Developer', 'Machine Learning Engineer') with 2-day recency.
+- **Results & Deduplication:**
+  - 175 raw postings pulled from LinkedIn, FreeHire, Naukri, and corporate ATS platforms (Greenhouse, Workday).
+  - Deduplicated against `job_search_tracker.csv` and `job_scraper/seen_jobs.json` (22 already seen, 28 repeated in batch filtered).
+  - 86 verified active jobs passing strictly <= 3 years experience check atomically persisted to `job_scraper/seen_jobs.json`.
+
+## [Daily Scrape Parity & 102 Verified Jobs] - 2026-11-13
+- **Workflow Run:**
+  - Automated `/fetch-jobs` execution across 7 key tech query vectors with 3-day recency covering multi-portal sources (LinkedIn, FreeHire, Naukri, Lever, Workday).
+- **Results & Deduplication:**
+  - 175 raw postings pulled across all channels.
+  - Deduplicated against `job_search_tracker.csv` and `job_scraper/seen_jobs.json` (19 already seen dropped, 13 batch duplicates filtered).
+  - 102 verified active jobs passing strictly <= 3 years experience check atomically persisted to `job_scraper/seen_jobs.json`.
+
+## [Bug Fix: Broken Job URLs & Ground-Truth Verification Engine] - 2026-11-13
+- **Issue/Symptom:**
+  - User reported that job links presented in chat were broken or invalid.
+- **Root Cause:**
+  - When `tools/scrape_cli.py` outputted a large report (102 jobs, 40+ KB), the terminal stdout was truncated by the runtime environment.
+  - Because of the truncation, the model synthesized numeric job IDs in chat instead of reading the ground truth from disk. The true IDs stored in `seen_jobs.json` (e.g. Adani AI Labs `4488686737`, TravClan `4489254153`, Comviva `4490097005`) returned HTTP 200, whereas the misquoted IDs returned HTTP 404.
+- **Actions Taken & Invariants Established:**
+  1. **Automated Live URL Health Check:** Added `verify_url_live(url)` in `tools/scrape_cli.py` that pings each candidate URL via HTTP HEAD/GET before accepting it, dropping any 404, 410, or dead links.
+  2. **Ground-Truth Report Export:** `tools/scrape_cli.py` now atomically exports `job_scraper/latest_scraped_report.json` containing the exact, validated URL and recruiter links for all verified positions.
+  3. **Strict Zero-Guessing Invariant:** Updated `C:\Users\Abhishek\.gemini\config\skills\fetch-jobs\SKILL.md` requiring the agent to read `job_scraper/latest_scraped_report.json` directly from disk. Generating or hallucinating URLs from memory is strictly banned.

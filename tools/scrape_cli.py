@@ -16,6 +16,8 @@ import re
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.request
 from pathlib import Path
 from urllib.parse import quote_plus
 
@@ -27,8 +29,13 @@ from job_key import make_key
 
 DEFAULT_QUERIES = [
     "Full Stack Developer",
+    "React Developer",
     "Python Developer",
+    "AI Engineer",
     "Backend Developer",
+    "Frontend Developer",
+    "Machine Learning Engineer",
+
 ]
 
 EXP_EXCLUDE_PATTERNS = [
@@ -94,6 +101,57 @@ def get_linkedin_detail(job_id: str) -> dict:
         return {}
 
 
+def search_freehire(query: str, jobage: int, limit: int) -> list[dict]:
+    cli_path = ROOT / ".agents" / "skills" / "freehire-search" / "cli" / "src" / "cli.ts"
+    cmd = [
+        "bun", "run", str(cli_path),
+        "search",
+        "-q", query,
+        "--country", "IN",
+        "--jobage", str(jobage),
+        "-n", str(limit),
+        "--format", "json",
+    ]
+    raw = run_cmd(cmd)
+    if not raw:
+        return []
+    try:
+        data = json.loads(raw)
+        results = data.get("results", [])
+        formatted = []
+        for r in results:
+            formatted.append({
+                "id": r.get("id"),
+                "title": r.get("title"),
+                "company": r.get("company"),
+                "url": r.get("url"),
+                "date": r.get("date"),
+                "location": r.get("location") or "India",
+                "description": r.get("description", ""),
+                "portal": "freehire-search",
+                "source": "cli",
+            })
+        return formatted
+    except json.JSONDecodeError:
+        return []
+
+
+def get_freehire_detail(slug: str) -> dict:
+    cli_path = ROOT / ".agents" / "skills" / "freehire-search" / "cli" / "src" / "cli.ts"
+    cmd = [
+        "bun", "run", str(cli_path),
+        "detail", str(slug),
+        "--format", "json",
+    ]
+    raw = run_cmd(cmd)
+    if not raw:
+        return {}
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        return {}
+
+
 def is_experience_valid(desc: str) -> bool:
     if not desc:
         return True
@@ -104,6 +162,28 @@ def is_experience_valid(desc: str) -> bool:
                 continue
             return False
     return True
+
+
+def verify_url_live(url: str, timeout: float = 3.5) -> bool:
+    if not url:
+        return False
+    try:
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as res:
+            return res.status in (200, 301, 302)
+    except urllib.error.HTTPError as e:
+        if e.code in (404, 410):
+            return False
+        if e.code in (403, 406, 429):
+            return True
+        return False
+    except Exception:
+        return False
 
 
 def determine_fit(title: str, desc: str) -> str:
@@ -122,21 +202,30 @@ def main():
     parser.add_argument("-q", "--query", help="Search query (default: all primary queries)")
     parser.add_argument("--jobage", type=int, default=1, help="Job age in days (default: 1 for daily runs)")
     parser.add_argument("-n", "--limit", type=int, default=15, help="Results per query (default: 15)")
+    parser.add_argument("--portal", choices=("all", "linkedin", "freehire"), default="all", help="Portal to search")
     parser.add_argument("--no-store", action="store_true", help="Do not save to seen_jobs.json (dry run)")
     args = parser.parse_args()
 
     queries = [args.query] if args.query else DEFAULT_QUERIES
     today_iso = datetime.date.today().isoformat()
 
-    print(f"🔍 Running job scrape (queries: {queries}, jobage: {args.jobage} days)...")
+    print(f"🔍 Running multi-portal job scrape (queries: {queries}, jobage: {args.jobage} days, portal: {args.portal})...")
     all_hits = []
-    for q in queries:
-        hits = search_linkedin(q, args.jobage, args.limit)
-        print(f"  -> Found {len(hits)} raw postings for '{q}'")
-        for h in hits:
-            h["portal"] = "linkedin-search"
-            h["source"] = "cli"
-            all_hits.append(h)
+
+    if args.portal in ("all", "linkedin"):
+        for q in queries:
+            hits = search_linkedin(q, args.jobage, args.limit)
+            print(f"  [LinkedIn] Found {len(hits)} raw postings for '{q}'")
+            for h in hits:
+                h["portal"] = "linkedin-search"
+                h["source"] = "cli"
+                all_hits.append(h)
+
+    if args.portal in ("all", "freehire"):
+        for q in queries:
+            hits = search_freehire(q, args.jobage, args.limit)
+            print(f"  [FreeHire] Found {len(hits)} raw postings for '{q}'")
+            all_hits.extend(hits)
 
     if not all_hits:
         print("No raw postings found.")
@@ -157,28 +246,41 @@ def main():
     verified_jobs = []
     for hit in selected:
         job_id = hit.get("id")
-        if not job_id:
-            continue
-        detail = get_linkedin_detail(job_id)
-        if not detail:
-            continue
-        if detail.get("isActive") is False:
-            continue
-        desc = detail.get("description", "")
+        portal = hit.get("portal", "linkedin-search")
+        desc = hit.get("description", "")
+
+        if portal == "linkedin-search":
+            if not job_id:
+                continue
+            detail = get_linkedin_detail(job_id)
+            if not detail:
+                continue
+            if detail.get("isActive") is False:
+                continue
+            desc = detail.get("description", "")
+        elif portal == "freehire-search":
+            if not desc and job_id:
+                detail = get_freehire_detail(job_id)
+                desc = detail.get("description", "")
+
         if not is_experience_valid(desc):
+            continue
+
+        url = hit.get("url", "")
+        if not verify_url_live(url):
             continue
 
         fit = determine_fit(hit.get("title", ""), desc)
         entry = {
             "title": hit.get("title"),
             "company": hit.get("company"),
-            "url": hit.get("url"),
+            "url": url,
             "first_seen": today_iso,
             "posted_date": hit.get("date") or today_iso,
             "deadline": None,
             "fit": fit,
             "status": "new",
-            "portal": "linkedin-search",
+            "portal": portal,
             "source": "cli",
             "location": hit.get("location", "India"),
             "description_snippet": desc[:200].replace("\n", " ") if desc else ""
@@ -189,6 +291,28 @@ def main():
     if not verified_jobs:
         print("No verified jobs passed experience and active filters.")
         return 0
+
+    # Write ground-truth report file so agents never hallucinate URLs
+    report_path = ROOT / "job_scraper" / "latest_scraped_report.json"
+    report_data = {
+        "scraped_at": datetime.datetime.now().isoformat(),
+        "total_verified": len(verified_jobs),
+        "jobs": [
+            {
+                "index": i,
+                "title": j["title"],
+                "company": j["company"],
+                "url": j["url"],
+                "fit": j["fit"],
+                "location": j["location"],
+                "recruiter_search": f"https://www.linkedin.com/search/results/people/?keywords={quote_plus(j['company'] + ' recruiter')}&origin=GLOBAL_SEARCH_HEADER"
+            }
+            for i, j in enumerate(verified_jobs, 1)
+        ]
+    }
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report_data, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"📄 Written verified report: {report_path}")
 
     # Store newly found jobs
     if not args.no_store:

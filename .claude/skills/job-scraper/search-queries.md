@@ -14,6 +14,8 @@ Primary (your market's job boards - CLIs run into these automatically):
 
 - **`linkedin.com/jobs`** — LinkedIn job listings (filter: India & Remote); also covered by `linkedin-search` CLI
 - **`freehire.me`** — aggregator covering many countries, markets, and remote opportunities; also covered by `freehire-search` CLI
+- **`naukri.com`** — India's largest job portal; indexed via `freehire-search` and `site:naukri.com`
+- **`in.indeed.com`** — India Indeed listings; searchable via `site:in.indeed.com`
 
 Secondary (company career pages via Google):
 
