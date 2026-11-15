@@ -87,3 +87,33 @@
   1. **Automated Live URL Health Check:** Added `verify_url_live(url)` in `tools/scrape_cli.py` that pings each candidate URL via HTTP HEAD/GET before accepting it, dropping any 404, 410, or dead links.
   2. **Ground-Truth Report Export:** `tools/scrape_cli.py` now atomically exports `job_scraper/latest_scraped_report.json` containing the exact, validated URL and recruiter links for all verified positions.
   3. **Strict Zero-Guessing Invariant:** Updated `C:\Users\Abhishek\.gemini\config\skills\fetch-jobs\SKILL.md` requiring the agent to read `job_scraper/latest_scraped_report.json` directly from disk. Generating or hallucinating URLs from memory is strictly banned.
+
+## [Daily Scrape Parity & 94 Verified Jobs] - 2026-11-15
+- **Workflow Run:**
+  - Automated `/fetch-jobs` execution across 7 key tech query vectors with 2-day recency covering multi-portal sources (LinkedIn, FreeHire, Naukri, AshbyHQ, Workday).
+  - Automated live HTTP URL validation verified all accepted postings prior to storage.
+- **Results & Deduplication:**
+  - 175 raw postings pulled across all channels.
+  - Deduplicated against `job_search_tracker.csv` and `job_scraper/seen_jobs.json` (24 already seen dropped, 13 batch duplicates filtered).
+  - 94 verified active jobs passing strictly <= 3 years experience check atomically persisted to `job_scraper/seen_jobs.json` and ground-truth exported to `job_scraper/latest_scraped_report.json`.
+
+## [Bug Fix: Experience Filter Leakage & Unicode Dash Matching] - 2026-11-15
+- **Issue/Symptom:**
+  - User reported that Speedioo — Full Stack Engineer (Index #3 in scraped report) slipped through the `<= 3 years` filter despite the job description stating `Senior Full Stack Engineer – Product & Platform` and `Experience: 6–8 Years`.
+  - Audit revealed 11 other jobs with explicit `Senior` / `Lead` titles in `latest_scraped_report.json`.
+- **Root Cause:**
+  1. **Unicode Dash Mismatch:** The previous regex `\b(?:4|5|6|7|8|9|10)\s*-\s*\d+\s*(?:years?|yrs?)` only matched standard ASCII hyphen `-` (`\x2d`). In Speedioo's posting, the experience was written as `Experience: 6–8 Years` using a Unicode En-Dash `–` (`\u2013`), so the regex completely missed it.
+  2. **Missing Key-Value Pattern:** Regex patterns lacked direct matching for key-value headers like `Experience: 6–8 Years` or `Exp: 5+ Years`.
+  3. **No Title Seniority Guard:** `tools/scrape_cli.py` lacked a title filter for senior roles, allowing postings with `Senior`, `Lead`, `Principal`, or `Staff` in the title or opening description lines to bypass filtering.
+  4. **Dangerous Whitelist Bypass:** `is_experience_valid` had a bypass `if re.search(r"\b(?:0-2|1-3|2-3|2-4)..."): continue` which allowed senior roles to pass if `1-3` was mentioned anywhere in the body.
+  5. **LinkedIn Metadata Misclassification:** LinkedIn's API labeled Speedioo's seniority as `"Entry level"`, bypassing any native portal-level seniority filter.
+- **Actions Taken:**
+  1. Upgraded `EXP_EXCLUDE_PATTERNS` in `tools/scrape_cli.py` to match all dash variants (`[-–—‒―/]`, `to`, `through`), key-value labels (`Experience: 6-8 Years`), open-ended qualifiers (`4+`, `5+`), and minimum thresholds (`minimum 4 years`).
+  2. Implemented `TITLE_EXCLUDE_PATTERNS` checking both `hit.get("title")` and the top 5 header lines of the description for `Senior`, `Sr.`, `Lead`, `Principal`, `Staff`, `Architect`, `Director`, `VP`, `Head of`, `Engineering Manager`.
+  3. Removed the reckless whitelist bypass from `is_experience_valid(desc, title)`.
+  4. Verified rejection of Speedioo (ID `4489874585`) via unit tests.
+  5. Pruned 12 leaked senior/high-exp jobs from `job_scraper/latest_scraped_report.json` (remaining: 82 cleanly verified jobs).
+- **Architectural Invariants & Guardrails Established:**
+  1. **Unicode Separator Invariant:** All range-based text filters MUST match Unicode en-dash (`\u2013`), em-dash (`\u2014`), slashes, and `to`/`through` alongside standard hyphens.
+  2. **Multi-Layer Seniority Filter:** Both job title and top description lines must be screened for seniority keywords; never rely solely on recruiter-supplied metadata (`seniority: Entry level`).
+  3. **Strict Hard Exclusion:** Any explicit requirement of $\ge 4$ years is an immediate hard rejection, regardless of whether lower numbers appear elsewhere in description prose.

@@ -38,10 +38,26 @@ DEFAULT_QUERIES = [
 
 ]
 
+SEP = r"(?:[-–—‒―/]|to|through)"
+UNITS = r"(?:years?|yrs?|yr\b)"
+
+TITLE_EXCLUDE_PATTERNS = [
+    re.compile(r"\b(Senior|Sr\.?|Lead|Principal|Staff|Architect|Director|VP|Head\s+of|Engineering\s+Manager)\b", re.I),
+]
+
 EXP_EXCLUDE_PATTERNS = [
-    re.compile(r"\b(4\+|5\+|6\+|7\+|8\+|9\+|10\+)\s*(?:years?|yrs?)", re.I),
-    re.compile(r"\b(?:4|5|6|7|8|9|10)\s*-\s*\d+\s*(?:years?|yrs?)", re.I),
-    re.compile(r"\b(?:minimum|at\s+least)\s+(?:4|5|6)\s+(?:years?|yrs?)", re.I),
+    # 4+ years, 5+ yrs, 6+ years, 10+ yrs, etc.
+    re.compile(r"\b(?:[4-9]|\d{2,})\s*(?:\+|plus)\s*" + UNITS, re.I),
+    # 4-6 years, 6–8 years, 4 to 7 yrs, 5-10 yrs (supports all unicode dashes & 'to')
+    re.compile(r"\b(?:[4-9]|\d{2,})\s*" + SEP + r"\s*\d+\s*" + UNITS, re.I),
+    # minimum / at least 4 years / min. 5 yrs / more than 3 years
+    re.compile(r"\b(?:minimum|at\s+least|min\.?|more\s+than)\s+(?:of\s+)?(?:[4-9]|\d{2,})\s*(?:\+)?\s*" + UNITS, re.I),
+    # 4 or more years
+    re.compile(r"\b(?:[4-9]|\d{2,})\s*(?:or\s+more)\s+" + UNITS, re.I),
+    # Key-value / field style: Experience: 6-8 Years, Exp: 5+ Years, Experience - 4 Years, etc.
+    re.compile(r"\b(?:experience|exp|work\s+experience)\s*[:–—-]\s*(?:minimum\s+|at\s+least\s+)?([4-9]|\d{2,})\s*(?:" + SEP + r"|\+|plus)?(?:\s*\d+)?\s*" + UNITS + r"?", re.I),
+    # 4-8 years of experience, 5+ years of relevant experience
+    re.compile(r"\b(?:[4-9]|\d{2,})\s*(?:" + SEP + r"|\+)?\s*(?:\d+)?\s*" + UNITS + r"\s*(?:of\s+)?(?:[\w\s]{0,25})?experience", re.I),
 ]
 
 
@@ -152,15 +168,27 @@ def get_freehire_detail(slug: str) -> dict:
         return {}
 
 
-def is_experience_valid(desc: str) -> bool:
+def is_experience_valid(desc: str, title: str = "") -> bool:
+    # 1. Reject if title explicitly specifies senior/lead/managerial positions
+    if title:
+        for pat in TITLE_EXCLUDE_PATTERNS:
+            if pat.search(title):
+                return False
+
     if not desc:
         return True
+
+    # 2. Reject if the opening lines of the description declare a senior/lead role
+    first_few_lines = "\n".join(desc.splitlines()[:5])
+    for pat in TITLE_EXCLUDE_PATTERNS:
+        if pat.search(first_few_lines):
+            return False
+
+    # 3. Reject if explicit 4+, 5+, 6-8, etc. years of experience are required
     for pat in EXP_EXCLUDE_PATTERNS:
         if pat.search(desc):
-            # Check if 1-3 or 2-4 is also mentioned
-            if re.search(r"\b(?:0-2|1-3|2-3|2-4)\s*(?:years?|yrs?)", desc, re.I):
-                continue
             return False
+
     return True
 
 
@@ -246,8 +274,13 @@ def main():
     verified_jobs = []
     for hit in selected:
         job_id = hit.get("id")
+        title = hit.get("title", "")
         portal = hit.get("portal", "linkedin-search")
         desc = hit.get("description", "")
+
+        # Quick pre-filter: skip roles whose title is explicitly Senior, Lead, Manager, etc.
+        if any(pat.search(title) for pat in TITLE_EXCLUDE_PATTERNS):
+            continue
 
         if portal == "linkedin-search":
             if not job_id:
@@ -263,7 +296,7 @@ def main():
                 detail = get_freehire_detail(job_id)
                 desc = detail.get("description", "")
 
-        if not is_experience_valid(desc):
+        if not is_experience_valid(desc, title):
             continue
 
         url = hit.get("url", "")

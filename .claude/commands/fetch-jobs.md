@@ -41,13 +41,15 @@ This automatically drops:
 
 ### Step 3: Hydrate & Validate Candidates
 For each hit in `selected`:
-1. Fetch full details via:
+1. Check title against `Senior`, `Sr.`, `Lead`, `Principal`, `Staff`, `Architect`, `Director`, `VP`, `Head of`, `Manager`. Discard immediately if matched.
+2. Fetch full details via:
    ```bash
    bun run .agents/skills/linkedin-search/cli/src/cli.ts detail <id> --format json
    ```
-2. Verify `isActive: true`. If `false`, mark status as `expired` so ghost postings are discarded.
-3. Verify Experience: Read the full description body. Exclude jobs requiring 4+, 5+, or senior 6+ years. Retain strictly <= 3 years (0-2 yrs, 1-3 yrs, 2-4 yrs SDE1).
-4. Assign Fit:
+3. Verify `isActive: true`. If `false`, mark status as `expired` so ghost postings are discarded.
+4. Verify opening lines of description: Discard if the header or role states Senior / Lead.
+5. Verify Experience: Read the full description body. Exclude any jobs requiring >= 4 years (`4+`, `5+`, `6–8`, `min 4 years`, `Experience: 6-8 Years`), testing for all dash types (Unicode en-dash `–`, em-dash `—`, hyphen `-`, and `to`). Retain strictly <= 3 years (0-2 yrs, 1-3 yrs, 2-4 yrs SDE1).
+6. Assign Fit:
    - **High Match:** Core alignment (React, Next.js, Python, FastAPI, Java, TypeScript, AI/LLMs).
    - **Medium Match:** Adjacent tech (Node.js backend, general SDE, cloud integrations).
    - **Low Match:** Mismatched tech stack.
