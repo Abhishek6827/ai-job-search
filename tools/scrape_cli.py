@@ -206,6 +206,43 @@ def is_url_experience_excluded(url: str) -> bool:
     return False
 
 
+BLOCKED_DOMAINS = [
+    "jobleads.com",
+    "devglobaljobs.com",
+    "qajobsboard.com",
+    "jooble.org",
+    "talent.com",
+    "adzuna.com",
+    "neuvoo.com",
+    "shine.com",
+    "crimsoniteam.freshteam.com",
+]
+
+OBSOLETE_TECH_PATTERNS = [
+    re.compile(r"\bReact\s*(?:js)?\s*[><=]?\s*1[56]\b", re.I),
+    re.compile(r"\bBootstrap\s*[><=]?\s*[234]\b", re.I),
+    re.compile(r"\bPython\s*2\.[67]\b", re.I),
+    re.compile(r"\bAngularJS\s*1\.[0-9]\b", re.I),
+]
+
+
+def is_url_and_posting_authentic(url: str, desc: str = "") -> bool:
+    if not url:
+        return False
+    from urllib.parse import urlparse
+    netloc = urlparse(url).netloc.lower()
+    for b in BLOCKED_DOMAINS:
+        if b in netloc:
+            return False
+
+    if desc:
+        for pat in OBSOLETE_TECH_PATTERNS:
+            if pat.search(desc):
+                return False
+
+    return True
+
+
 def is_mass_it_consultancy_unspecified(company: str, desc: str, title: str) -> bool:
     if not company:
         return False
@@ -220,6 +257,10 @@ def is_mass_it_consultancy_unspecified(company: str, desc: str, title: str) -> b
 
 
 def is_experience_valid(desc: str, title: str = "", url: str = "", company: str = "") -> bool:
+    # 0. Reject spam aggregator domains and obsolete ghost postings
+    if url and not is_url_and_posting_authentic(url, desc):
+        return False
+
     # 1. Reject if URL contains high experience (common in Naukri/Indeed job slugs)
     if url and is_url_experience_excluded(url):
         return False
