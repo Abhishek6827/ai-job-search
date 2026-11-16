@@ -14,6 +14,11 @@ Execute the `/fetch-jobs` workflow leveraging all project skills, portal CLIs, a
 - **Experience:** 2+ years professional experience (Strictly <= 3 years; entry to mid-level only. Reject 4+, 5+ years).
 - **Role Seniority Invariant:** Absolute ban on Senior, Lead, Principal, Staff, Architect, or Director positions. Both title and the opening lines of the description must be screened.
 - **Mass IT Consultancy Lateral Invariant:** Hard reject generic lateral technical postings from mass IT consultancies (`Infosys`, `TCS`, `Wipro`, `Cognizant`, `Birlasoft`, `HCLTech`, `Tech Mahindra`, `LTIMindtree`, `Capgemini`, `Accenture`) because their lateral requisition codes (e.g. `INFSYS-EXTERNAL-XXXXXX`) hide 5-9+ years requirements on internal portals while omitting them on LinkedIn. Retain ONLY if explicitly marked as intern, refresher, trainee, 0-1, or 0-2 yrs.
+- **Domain Hygiene & Anti-Ghost-Job Invariant:**
+  - Absolute ban on secondary content-farm scrapers (`jobleads.com`, `devglobaljobs.com`, `qajobsboard.com`, `jooble.org`, `talent.com`, `adzuna.com`, `neuvoo.com`, `shine.com`). Only allow direct LinkedIn, verified corporate ATS (`greenhouse.io`, `lever.co`, `ashbyhq.com`, `myworkdayjobs.com`), and primary tech portals (`naukri.com`, `cutshort.io`, `hirist.tech`, `himalayas.app`).
+  - Absolute ban on dormant/dead ATS subdomains (e.g. `crimsoniteam.freshteam.com`).
+  - Immediate rejection of postings requiring obsolete tech stacks (>5 years old: React 15/16, Bootstrap 2/3/4, Python 2.7, AngularJS 1.x).
+  - Strict recency: LinkedIn postings must be <= 48 hours (`--jobage 2`). Aggregator re-index dates must never be trusted without source verification.
 - **Core Tech Stack:** TypeScript, React.js, Next.js, Node.js, Python, FastAPI, Java, Spring Boot, REST APIs, Microservices, PostgreSQL, MongoDB, Docker, LLMs & Agentic AI workflows.
 
 ---
@@ -43,17 +48,19 @@ This automatically drops:
 
 ### Step 3: Hydrate & Validate Candidates
 For each hit in `selected`:
-1. Check URL slug: Hard reject if URL contains high experience ranges (e.g. `4-to-5-years`, `3-to-6-years`, `3-to-7-years`, `3-to-5-years`, `4-plus-years`).
-2. Check title against `Senior`, `Sr.`, `Lead`, `Principal`, `Staff`, `Architect`, `Director`, `VP`, `Head of`, `Manager`. Discard immediately if matched.
-3. Fetch full details via:
+1. Check URL domain: Hard reject if hosted on secondary spam scrapers (`jobleads.com`, `devglobaljobs.com`, `qajobsboard.com`, `shine.com`, etc.) or dormant unmaintained portals (`crimsoniteam`).
+2. Check URL slug: Hard reject if URL contains high experience ranges (e.g. `4-to-5-years`, `3-to-6-years`, `3-to-7-years`, `3-to-5-years`, `4-plus-years`).
+3. Check title against `Senior`, `Sr.`, `Lead`, `Principal`, `Staff`, `Architect`, `Director`, `VP`, `Head of`, `Manager`. Discard immediately if matched.
+4. Fetch full details via:
    ```bash
    bun run .agents/skills/linkedin-search/cli/src/cli.ts detail <id> --format json
    ```
-4. Verify `isActive: true`. If `false`, mark status as `expired` so ghost postings are discarded.
-5. Screen company: Hard reject generic lateral openings from mass IT consultancies (Infosys, TCS, Wipro, Birlasoft, Cognizant, etc.) unless explicitly designated with early-career word boundaries (`\bintern\b`, `\bfresher\b`, `\btrainee\b`, `\b0-1\b`, `\b0-2\b`).
-6. Verify opening lines of description: Discard if the header or role states Senior / Lead.
-7. Verify Experience: Read the full description body. Exclude any jobs requiring >= 4 years (`4+`, `5+`, `6–8`, `min 4 years`, `Experience: 6-8 Years`), testing for all dash types (Unicode en-dash `–`, em-dash `—`, hyphen `-`, and `to`). Hard reject any range where upper bound is >= 5 (e.g. `2-5 years`, `3-5 years`, `3–6 years`, `3–7 years`) or >= 6. Retain strictly <= 3 years (0-2 yrs, 1-3 yrs, 2-4 yrs SDE1).
-8. Assign Fit:
+5. Verify `isActive: true`. If `false`, mark status as `expired` so ghost postings are discarded.
+6. Screen company: Hard reject generic lateral openings from mass IT consultancies (Infosys, TCS, Wipro, Birlasoft, Cognizant, etc.) unless explicitly designated with early-career word boundaries (`\bintern\b`, `\bfresher\b`, `\btrainee\b`, `\b0-1\b`, `\b0-2\b`).
+7. Verify opening lines of description: Discard if the header or role states Senior / Lead.
+8. Detect obsolete tech: Hard reject postings requiring obsolete legacy stacks (>5 yrs old: React 15/16, Bootstrap 2/3/4, Python 2.7, AngularJS 1.x) indicating dormant ghost jobs.
+9. Verify Experience: Read the full description body. Exclude any jobs requiring >= 4 years (`4+`, `5+`, `6–8`, `min 4 years`, `Experience: 6-8 Years`), testing for all dash types (Unicode en-dash `–`, em-dash `—`, hyphen `-`, and `to`). Hard reject any range where upper bound is >= 5 (e.g. `2-5 years`, `3-5 years`, `3–6 years`, `3–7 years`) or >= 6. Retain strictly <= 3 years (0-2 yrs, 1-3 yrs, 2-4 yrs SDE1).
+10. Assign Fit:
    - **High Match:** Core alignment (React, Next.js, Python, FastAPI, Java, TypeScript, AI/LLMs).
    - **Medium Match:** Adjacent tech (Node.js backend, general SDE, cloud integrations).
    - **Low Match:** Mismatched tech stack.
