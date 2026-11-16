@@ -97,7 +97,20 @@
   - Deduplicated against `job_search_tracker.csv` and `job_scraper/seen_jobs.json` (24 already seen dropped, 13 batch duplicates filtered).
   - 94 verified active jobs passing strictly <= 3 years experience check atomically persisted to `job_scraper/seen_jobs.json` and ground-truth exported to `job_scraper/latest_scraped_report.json`.
 
-## [Bug Fix: Experience Filter Leakage & Unicode Dash Matching] - 2026-11-15
+## [Bug Fix: Mass IT Portal Obfuscation & Mid-Range Experience Leaks] - 2026-11-16
+- **Issue/Symptom:**
+  - User reported that Infosys — GEN AI Engineer (Reference Code: `INFSYS-EXTERNAL-253596`) required `Work Experience: 5 - 9 Years` on their internal career portal.
+  - Audit revealed Flexiple (`3–7 years`), Linedata (`3–6 years`), and Surya Software (`2 - 5 years`) also bypassed the filter.
+- **Root Cause:**
+  1. **Mass IT Consultancy Portal Obfuscation:** Infosys and Indian IT service consultancies (Birlasoft, TCS, Wipro, etc.) post generic lateral job requisitions on LinkedIn with zero experience mentions in the LinkedIn description text. The 5-9 years requirement exists solely on their internal careers portal (`career.infosys.com`). Scrapers reading only LinkedIn description text found no experience numbers, defaulting to valid.
+  2. **Lower-Bound Regex Blind Spot:** `EXP_EXCLUDE_PATTERNS` only checked ranges starting with 4+ (`[4-9]`), completely missing mid-level ranges starting with 2 or 3 that extend to 5, 6, 7+ years (`2 - 5 years`, `3–6 years`, `3–7 years`).
+- **Actions Taken:**
+  1. **Mass IT Consultancy Guard:** Implemented `MASS_IT_CONSULTANCIES` list and `is_mass_it_consultancy_unspecified(company, desc, title)` in `tools/scrape_cli.py`. Rejects all generic lateral openings from mass IT consultancies unless explicitly marked with early-career word boundaries (`\bintern\b`, `\bfresher\b`, `\btrainee\b`, `\b0-1\b`, `\b0-2\b`).
+  2. **Expanded Mid-Range Regexes:** Added patterns catching `[23]\s*[-–—to]\s*[5-9]`, upper bounds $\ge 6$, and `3 to 5 years`.
+  3. **Purged Leaked Jobs:** Removed 7 invalid jobs (Infosys, Birlasoft, Flexiple, Linedata, Surya Software) from `job_scraper/latest_scraped_report.json`, leaving 28 cleanly verified jobs.
+- **Architectural Invariants & Guardrails Established:**
+  1. **Mass Consultancy Lateral Invariant:** Generic lateral postings from mass IT service firms are treated as high-experience lateral hires by default and rejected unless early-career tokens are present.
+  2. **Upper-Bound Cap Invariant:** Any experience range with an upper bound $\ge 5$ (even if starting at 2 or 3) is strictly rejected.
 - **Issue/Symptom:**
   - User reported that Speedioo — Full Stack Engineer (Index #3 in scraped report) slipped through the `<= 3 years` filter despite the job description stating `Senior Full Stack Engineer – Product & Platform` and `Experience: 6–8 Years`.
   - Audit revealed 11 other jobs with explicit `Senior` / `Lead` titles in `latest_scraped_report.json`.

@@ -45,19 +45,34 @@ TITLE_EXCLUDE_PATTERNS = [
     re.compile(r"\b(Senior|Sr\.?|Lead|Principal|Staff|Architect|Director|VP|Head\s+of|Engineering\s+Manager)\b", re.I),
 ]
 
+MASS_IT_CONSULTANCIES = [
+    "infosys", "tata consultancy services", "tcs", "wipro", "cognizant",
+    "tech mahindra", "birlasoft", "hcl", "hcltech", "ltimindtree",
+    "capgemini", "accenture", "mindtree", "mphasis", "hexaware"
+]
+
 EXP_EXCLUDE_PATTERNS = [
     # 4+ years, 5+ yrs, 6+ years, 10+ yrs, etc.
     re.compile(r"\b(?:[4-9]|\d{2,})\s*(?:\+|plus)\s*" + UNITS, re.I),
     # 4-6 years, 6–8 years, 4 to 7 yrs, 5-10 yrs (supports all unicode dashes & 'to')
     re.compile(r"\b(?:[4-9]|\d{2,})\s*" + SEP + r"\s*\d+\s*" + UNITS, re.I),
+    # Ranges starting with 2 or 3 that extend to 5, 6, 7, 8, 9+ (e.g. 2 - 5 years, 3–6 years, 3–7 years)
+    re.compile(r"\b(?:[23])\s*" + SEP + r"\s*(?:[5-9]|\d{2,})\s*" + UNITS, re.I),
+    # Ranges with upper bound >= 6 (e.g. 1-6 years, 2-7 years)
+    re.compile(r"\b\d+\s*" + SEP + r"\s*(?:[6-9]|\d{2,})\s*" + UNITS, re.I),
+    # 3 to 5 years / 3-5 years mid-level
+    re.compile(r"\b3\s*" + SEP + r"\s*5\s*" + UNITS, re.I),
     # minimum / at least 4 years / min. 5 yrs / more than 3 years
     re.compile(r"\b(?:minimum|at\s+least|min\.?|more\s+than)\s+(?:of\s+)?(?:[4-9]|\d{2,})\s*(?:\+)?\s*" + UNITS, re.I),
     # 4 or more years
     re.compile(r"\b(?:[4-9]|\d{2,})\s*(?:or\s+more)\s+" + UNITS, re.I),
-    # Key-value / field style: Experience: 6-8 Years, Exp: 5+ Years, Experience - 4 Years, etc.
+    # Key-value / field style: Experience: 6-8 Years, Exp: 5+ Years, Experience - 4 Years, Experience: 5-9 Years, etc.
     re.compile(r"\b(?:experience|exp|work\s+experience)\s*[:–—-]\s*(?:minimum\s+|at\s+least\s+)?([4-9]|\d{2,})\s*(?:" + SEP + r"|\+|plus)?(?:\s*\d+)?\s*" + UNITS + r"?", re.I),
+    # Key-value with 3-5, 3-6, 3-7, 2-5
+    re.compile(r"\b(?:experience|exp|work\s+experience)\s*[:–—-]\s*(?:minimum\s+|at\s+least\s+)?(?:[23])\s*" + SEP + r"\s*(?:[5-9]|\d{2,})\s*" + UNITS + r"?", re.I),
     # 4-8 years of experience, 5+ years of relevant experience
     re.compile(r"\b(?:[4-9]|\d{2,})\s*(?:" + SEP + r"|\+)?\s*(?:\d+)?\s*" + UNITS + r"\s*(?:of\s+)?(?:[\w\s]{0,25})?experience", re.I),
+    re.compile(r"\b(?:[23])\s*" + SEP + r"\s*(?:[5-9]|\d{2,})\s*" + UNITS + r"\s*(?:of\s+)?(?:[\w\s]{0,25})?experience", re.I),
 ]
 
 
@@ -168,23 +183,67 @@ def get_freehire_detail(slug: str) -> dict:
         return {}
 
 
-def is_experience_valid(desc: str, title: str = "") -> bool:
-    # 1. Reject if title explicitly specifies senior/lead/managerial positions
+def is_url_experience_excluded(url: str) -> bool:
+    if not url:
+        return False
+    # Check for range pattern in URL like 4-to-5-years, 3-to-6-years, 3-to-5-years
+    range_match = re.search(r"[-_](\d+)[-_]to[-_](\d+)[-_]years?", url, re.I)
+    if range_match:
+        min_yr = int(range_match.group(1))
+        max_yr = int(range_match.group(2))
+        if min_yr >= 4:
+            return True
+        if min_yr >= 3 and max_yr >= 5:
+            return True
+        if max_yr >= 6:
+            return True
+        return False
+
+    # Check for X-plus-years like 4-plus-years, 5-plus-years
+    if re.search(r"[-_]([4-9]|\d{2,})[-_]plus[-_]years?", url, re.I):
+        return True
+
+    return False
+
+
+def is_mass_it_consultancy_unspecified(company: str, desc: str, title: str) -> bool:
+    if not company:
+        return False
+    comp_clean = re.sub(r"[^\w\s]", " ", company.lower())
+    if not any(c in comp_clean.split() or c in comp_clean for c in MASS_IT_CONSULTANCIES):
+        return False
+    # If mass IT consultancy, only allow if explicitly marked as early-career
+    text = f"{title} {desc}"
+    if re.search(r"\b(intern|internship|fresher|entry[\s-]level|trainee|0-1|0-2|1-2)\b", text, re.I):
+        return False
+    return True
+
+
+def is_experience_valid(desc: str, title: str = "", url: str = "", company: str = "") -> bool:
+    # 1. Reject if URL contains high experience (common in Naukri/Indeed job slugs)
+    if url and is_url_experience_excluded(url):
+        return False
+
+    # 2. Reject if title explicitly specifies senior/lead/managerial positions
     if title:
         for pat in TITLE_EXCLUDE_PATTERNS:
             if pat.search(title):
                 return False
 
+    # 3. Reject generic lateral openings from mass IT consultancies that hide 5-9+ yrs on internal portals
+    if company and is_mass_it_consultancy_unspecified(company, desc, title):
+        return False
+
     if not desc:
         return True
 
-    # 2. Reject if the opening lines of the description declare a senior/lead role
+    # 4. Reject if the opening lines of the description declare a senior/lead role
     first_few_lines = "\n".join(desc.splitlines()[:5])
     for pat in TITLE_EXCLUDE_PATTERNS:
         if pat.search(first_few_lines):
             return False
 
-    # 3. Reject if explicit 4+, 5+, 6-8, etc. years of experience are required
+    # 5. Reject if explicit 4+, 5+, 6-8, 3-6, 3-7, etc. years of experience are required
     for pat in EXP_EXCLUDE_PATTERNS:
         if pat.search(desc):
             return False
@@ -296,10 +355,11 @@ def main():
                 detail = get_freehire_detail(job_id)
                 desc = detail.get("description", "")
 
-        if not is_experience_valid(desc, title):
+        url = hit.get("url", "")
+        company = hit.get("company", "")
+        if not is_experience_valid(desc, title, url, company):
             continue
 
-        url = hit.get("url", "")
         if not verify_url_live(url):
             continue
 
